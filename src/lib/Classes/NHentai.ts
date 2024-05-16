@@ -118,7 +118,7 @@ export class NHentai {
                     this._options.site.split('nhentai.')[1] as 'to'
                 )
                 if (!results.data.length)
-                    throw new Error('No doujin results found')
+                    throw new Error('No search results found')
                 return results
             })
     }
@@ -149,7 +149,100 @@ export class NHentai {
                     this._options.site.split('nhentai.')[1] as 'to'
                 )
                 if (!results.data.length)
-                    throw new Error('No doujin results found')
+                    throw new Error('No tags results found')
+                return results
+            })
+    }
+
+    /**
+     * Searches artist for a doujin by a query
+     * @param query Artist of the doujin to search
+     * @param options Options for searching
+     * @returns The result of the search
+     */
+    public searchWithArtist = async (
+        query: string,
+        options?: { page?: number }
+    ): Promise<IList> => {
+        if (!query)
+            throw new Error("The 'query' parameter shouldn't be undefined")
+        let page = 1
+        if (options?.page && options.page > 0) page = options.page
+        return await this.#axios
+            .get<string>(
+                `${this._options.site}/artist/${query}${
+                    page > 1 ? `?page=${page}` : ''
+                }`
+            )
+            .then((res) => {
+                const results = parseDoujinList(
+                    load(res.data),
+                    this._options.site.split('nhentai.')[1] as 'to'
+                )
+                if (!results.data.length)
+                    throw new Error('No artists results found')
+                return results
+            })
+    }
+
+    /**
+     * Searches parody for a doujin by a query
+     * @param query Parody of the doujin to search
+     * @param options Options for searching
+     * @returns The result of the search
+     */
+    public searchWithParody = async (
+        query: string,
+        options?: { page?: number }
+    ): Promise<IList> => {
+        if (!query)
+            throw new Error("The 'query' parameter shouldn't be undefined")
+        let page = 1
+        if (options?.page && options.page > 0) page = options.page
+        return await this.#axios
+            .get<string>(
+                `${this._options.site}/parody/${query}${
+                    page > 1 ? `?page=${page}` : ''
+                }`
+            )
+            .then((res) => {
+                const results = parseDoujinList(
+                    load(res.data),
+                    this._options.site.split('nhentai.')[1] as 'to'
+                )
+                if (!results.data.length)
+                    throw new Error('No parodies results found')
+                return results
+            })
+    }
+
+    /**
+     * Searches character for a doujin by a query
+     * @param query Character of the doujin to search
+     * @param options Options for searching
+     * @returns The result of the search
+     */
+    public searchWithCharacter = async (
+        query: string,
+        options?: { page?: number }
+    ): Promise<IList> => {
+        if (!query)
+            throw new Error("The 'query' parameter shouldn't be undefined")
+        let page = 1
+        if (options?.page && options.page > 0) page = options.page
+        return await this.#axios
+            .get<string>(
+                `${this._options.site}/character/${query}${
+                    page > 1 ? `?page=${page}` : ''
+                }`
+            )
+            .then((res) => {
+                const results = parseDoujinList(
+                    load(res.data),
+                    this._options.site.split('nhentai.')[1] as 'to'
+                )
+                if (!results.data.length)
+                    throw new Error('No characters results found')
                 return results
             })
     }
