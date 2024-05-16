@@ -138,7 +138,11 @@ export class NHentai {
         let page = 1
         if (options?.page && options.page > 0) page = options.page
         return await this.#axios
-            .get<string>(`${this._options.site}/tag/${query}&page=${page}`)
+            .get<string>(
+                `${this._options.site}/tag/${query}${
+                    page > 1 ? `?page=${page}` : ''
+                }`
+            )
             .then((res) => {
                 const results = parseDoujinList(
                     load(res.data),
@@ -149,7 +153,6 @@ export class NHentai {
                 return results
             })
     }
-
 
     /**
      * Gets the info of a doujin by its ID
