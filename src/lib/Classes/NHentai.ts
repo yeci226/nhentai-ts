@@ -124,6 +124,34 @@ export class NHentai {
     }
 
     /**
+     * Searches Tag for a doujin by a query
+     * @param query Tag of the doujin to search
+     * @param options Options for searching
+     * @returns The result of the search
+     */
+    public searchWithTag = async (
+        query: string,
+        options?: { page?: number }
+    ): Promise<IList> => {
+        if (!query)
+            throw new Error("The 'query' parameter shouldn't be undefined")
+        let page = 1
+        if (options?.page && options.page > 0) page = options.page
+        return await this.#axios
+            .get<string>(`${this._options.site}/tag/${query}&page=${page}`)
+            .then((res) => {
+                const results = parseDoujinList(
+                    load(res.data),
+                    this._options.site.split('nhentai.')[1] as 'to'
+                )
+                if (!results.data.length)
+                    throw new Error('No doujin results found')
+                return results
+            })
+    }
+
+
+    /**
      * Gets the info of a doujin by its ID
      * @param id ID of the doujin
      * @returns Info of the doujin
