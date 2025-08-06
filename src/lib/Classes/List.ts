@@ -21,7 +21,7 @@ export class List implements IListData {
             .then(({ data }) =>
                 parseDoujinInfo(
                     load(data),
-                    this.url.split('nhentai.')[1].split('/')[0] as 'to'
+                    this.url.split('nhentai.')[1].split('/')[0] as 'to' | 'net' | 'website'
                 )
             )
             .catch((err) => {

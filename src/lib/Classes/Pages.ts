@@ -36,12 +36,13 @@ export class Pages {
         pdf.pipe(stream)
         for (const url of this.pages) {
             const { data } = await axios.get<Buffer>(url, {
-                headers: url.includes('cdn.dogehls.xyz') ? { 'Referer': 'https://nhentai.to' } : {},
+                headers: url.includes('cdn.dogehls.xyz')
+                    ? { Referer: 'https://nhentai.to' }
+                    : {},
                 responseType: 'arraybuffer'
             })
-            const img = (pdf as any).openImage(data)
-            pdf.addPage({ size: [img.width, img.height] })
-            pdf.image(img, 0, 0)
+            pdf.addPage()
+            pdf.image(data, 0, 0, { fit: [pdf.page.width, pdf.page.height] })
             const index = this.pages.indexOf(url)
             if (index === this.pages.length - 1) pdf.end()
         }
@@ -74,10 +75,14 @@ export class Pages {
                 `${this.pages.indexOf(url) + 1}.${
                     url.split('.')[url.split('.').length - 1]
                 }`,
-                (await axios.get<Buffer>(url, {
-                    headers: url.includes('cdn.dogehls.xyz') ? { 'Referer': 'https://nhentai.to' } : {},
-                    responseType: 'arraybuffer'
-                })).data,
+                (
+                    await axios.get<Buffer>(url, {
+                        headers: url.includes('cdn.dogehls.xyz')
+                            ? { Referer: 'https://nhentai.to' }
+                            : {},
+                        responseType: 'arraybuffer'
+                    })
+                ).data,
                 { binary: true }
             )
         const buffer = await zip.generateAsync({ type: 'nodebuffer' })

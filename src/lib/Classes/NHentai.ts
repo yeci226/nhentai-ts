@@ -9,6 +9,24 @@ import { getAPIGalleryPages } from '../util'
 
 export class NHentai {
     #axios: AxiosInstance
+
+    /**
+     * Helper method to extract site name from URL
+     */
+    private getSiteName(): 'to' | 'net' | 'website' {
+        const siteName = this._options.site
+            .replace('https://', '')
+            .replace('http://', '')
+            .replace(/\/$/, '')
+
+        if (siteName.includes('nhentai.to')) return 'to'
+        if (siteName.includes('nhentai.net')) return 'net'
+        if (siteName.includes('nhentai.website')) return 'website'
+
+        // Default fallback
+        return 'to'
+    }
+
     /**
      * Constructs an instance of the NHentai class
      * @param _options Options of the NHentai class
@@ -23,14 +41,15 @@ export class NHentai {
         }
     ) {
         this.#axios = axios
-        if (
-            !sites.includes(
-                this._options.site
-                    .replace('https:', '')
-                    .replace(/\//g, '') as TSite
-            )
-        )
+        // Extract the site name from the URL
+        const siteName = this._options.site
+            .replace('https://', '')
+            .replace('http://', '')
+            .replace(/\/$/, '') as TSite
+
+        if (!sites.includes(siteName)) {
             this._options.site = 'https://nhentai.to'
+        }
         if (!this._options.site.startsWith('https://'))
             this._options.site =
                 `https://${this._options.site}` as `https://${TSite}`
@@ -66,7 +85,7 @@ export class NHentai {
             .then(async ({ data }) =>
                 parseDoujinInfo(
                     load(data),
-                    this._options.site.split('nhentai.')[1] as 'to',
+                    this.getSiteName(),
                     this._options.site.includes('net')
                         ? await getAPIGalleryPages(this.#axios, data)
                         : undefined
@@ -81,16 +100,11 @@ export class NHentai {
      * @param page Page number of the list
      * @returns The doujin list
      */
-    public explore = async (page: number = 1): Promise<IList> => {
+    public explore = async (page = 1): Promise<IList> => {
         if (isNaN(page) || page < 1) page = 1
         return await this.#axios
             .get<string>(`${this._options.site}?page=${page}`)
-            .then(({ data }) =>
-                parseDoujinList(
-                    load(data),
-                    this._options.site.split('nhentai.')[1] as 'to'
-                )
-            )
+            .then(({ data }) => parseDoujinList(load(data), this.getSiteName()))
             .catch((err) => {
                 throw new Error(err.message)
             })
@@ -115,7 +129,7 @@ export class NHentai {
             .then((res) => {
                 const results = parseDoujinList(
                     load(res.data),
-                    this._options.site.split('nhentai.')[1] as 'to'
+                    this.getSiteName()
                 )
                 if (!results.data.length)
                     throw new Error('No search results found')
@@ -146,7 +160,7 @@ export class NHentai {
             .then((res) => {
                 const results = parseDoujinList(
                     load(res.data),
-                    this._options.site.split('nhentai.')[1] as 'to'
+                    this.getSiteName()
                 )
                 if (!results.data.length)
                     throw new Error('No tags results found')
@@ -177,7 +191,7 @@ export class NHentai {
             .then((res) => {
                 const results = parseDoujinList(
                     load(res.data),
-                    this._options.site.split('nhentai.')[1] as 'to'
+                    this.getSiteName()
                 )
                 if (!results.data.length)
                     throw new Error('No artists results found')
@@ -208,7 +222,7 @@ export class NHentai {
             .then((res) => {
                 const results = parseDoujinList(
                     load(res.data),
-                    this._options.site.split('nhentai.')[1] as 'to'
+                    this.getSiteName()
                 )
                 if (!results.data.length)
                     throw new Error('No parodies results found')
@@ -239,7 +253,7 @@ export class NHentai {
             .then((res) => {
                 const results = parseDoujinList(
                     load(res.data),
-                    this._options.site.split('nhentai.')[1] as 'to'
+                    this.getSiteName()
                 )
                 if (!results.data.length)
                     throw new Error('No characters results found')
@@ -261,7 +275,7 @@ export class NHentai {
             .then(async (res) =>
                 parseDoujinInfo(
                     load(res.data),
-                    this._options.site.split('nhentai.')[1] as 'to',
+                    this.getSiteName(),
                     this._options.site.includes('net')
                         ? await getAPIGalleryPages(this.#axios, res.data)
                         : undefined

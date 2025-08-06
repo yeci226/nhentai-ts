@@ -1,5 +1,5 @@
 import { CheerioAPI } from 'cheerio'
-import { baseURLS, clean, getExtension, getPageStatus, Pages, imageSites } from '../lib'
+import { baseURLS, clean, getExtension, Pages, imageSites } from '../lib'
 import { TURL, IDoujinInfo } from '../Types'
 
 export const parseDoujinInfo = async (
@@ -8,12 +8,11 @@ export const parseDoujinInfo = async (
     api_pages?: { t: string }[]
 ): Promise<IDoujinInfo> => {
     const pages: string[] = []
-    const gallery_id = (
-        $('.thumb-container').first().find('a > img').attr('data-src') ||
-        '/galleries/'
-    )
-        .split('/galleries/')[1]
-        .split('/')[0]
+    const dataSrc =
+        $('.thumb-container').first().find('a > img').attr('data-src') || ''
+    const gallery_id = dataSrc.includes('/galleries/')
+        ? dataSrc.split('/galleries/')[1]?.split('/')[0] || ''
+        : ''
     if (site === 'net' && api_pages)
         api_pages.forEach((page, i) =>
             pages.push(
@@ -23,20 +22,23 @@ export const parseDoujinInfo = async (
             )
         )
     else
-    for (const el of $('.thumb-container')) {
-        const url = ($(el).find('a > img').attr('data-src') || '').replace(/t(?=\.)/, '')
-        if (url) {
-            const page = url.replace(imageSites[site], 'i.nhentai.net')
-            const status = await getPageStatus(page)
-            pages.push(status === 200 ? page : url)
+        for (const el of $('.thumb-container')) {
+            const url = ($(el).find('a > img').attr('data-src') || '').replace(
+                /t(?=\.)/,
+                ''
+            )
+            if (url) {
+                const page = url.replace(imageSites[site], 'i.nhentai.net')
+                pages.push(page)
+            }
         }
-    }
     const cover =
         $('#cover').find('a > img').attr('data-src') ||
         $('#cover').find('a > img').attr('src')
-    const id = ($('#cover').find('a').attr('href') || 'g/')
-        .split('g/')[1]
-        .split('/')[0]
+    const href = $('#cover').find('a').attr('href') || ''
+    const id = href.includes('g/')
+        ? href.split('g/')[1]?.split('/')[0] || ''
+        : ''
     const titles = {
         english: $('#info').find('h1').text().trim(),
         original: $('#info').find('h2').text().trim()
@@ -89,7 +91,7 @@ export const parseDoujinInfo = async (
         groups: clean(groups),
         languages: clean(languages),
         categories: clean(categories),
-        cover: !pages.some(url => url.includes('cdn.dogehls.xyz'))
+        cover: !pages.some((url) => url.includes('cdn.dogehls.xyz'))
             ? cover.replace('cdn.dogehls.xyz', 't3.nhentai.net')
             : null,
         images,
