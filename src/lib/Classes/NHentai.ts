@@ -97,7 +97,7 @@ export class NHentai {
 
     /**
      * Explores the list of doujin
-     * @param page Page number of the list
+     * @param page Page number of the lists
      * @returns The doujin list
      */
     public explore = async (page = 1): Promise<IList> => {

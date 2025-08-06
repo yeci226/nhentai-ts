@@ -41,8 +41,13 @@ export class Pages {
                     : {},
                 responseType: 'arraybuffer'
             })
-            pdf.addPage()
-            pdf.image(data, 0, 0, { fit: [pdf.page.width, pdf.page.height] })
+            const img = (
+                pdf as typeof PDFDocument.prototype & {
+                    openImage(data: Buffer): { width: number; height: number }
+                }
+            ).openImage(data)
+            pdf.addPage({ size: [img.width, img.height] })
+            pdf.image(img, 0, 0)
             const index = this.pages.indexOf(url)
             if (index === this.pages.length - 1) pdf.end()
         }
