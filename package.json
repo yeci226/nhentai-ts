@@ -1,9 +1,17 @@
 {
-    "name": "@shineiichijo/nhentai-ts",
+    "name": "@yeci226/nhentai-ts",
     "description": "A scraper for NHentai with types",
     "version": "1.0.5",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.mjs",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/cjs/index.js",
+            "import": "./dist/esm/index.mjs",
+            "types": "./dist/types/index.d.ts"
+        }
+    },
     "license": "MIT",
     "keywords": [
         "nhentai",
@@ -30,7 +38,7 @@
         "url": "https://github.com/LuckyYam"
     },
     "scripts": {
-        "build": "yarn rimraf dist && yarn tsc",
+        "build": "tsx src/build.ts",
         "lint": "yarn eslint .",
         "format": "yarn prettier --write --config .prettierrc.json \"src/**/*.ts\"",
         "lint:fix": "yarn eslint --fix .",
@@ -51,8 +59,11 @@
         "@types/tough-cookie": "^4.0.5",
         "@typescript-eslint/eslint-plugin": "^5.31.0",
         "@typescript-eslint/parser": "^5.31.0",
+        "esbuild": "^0.27.2",
         "eslint": "^8.20.0",
         "prettier": "^2.7.1",
+        "tiny-glob": "^0.2.9",
+        "tsx": "^4.21.0",
         "typedoc": "^0.23.9",
         "typescript": "^4.7.4"
     }

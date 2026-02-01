@@ -67,7 +67,7 @@ import glob from 'tiny-glob'
 
     console.log('\x1b[34mGenerating typescript declaration ...\x1b[0m')
     execSync(
-        'tsc --declaration --emitDeclarationOnly --declarationDir ./dist/types/'
+        'tsc --declaration --emitDeclarationOnly --declarationDir ./dist/types/ --skipLibCheck'
     )
 
     const endTime = performance.now()
