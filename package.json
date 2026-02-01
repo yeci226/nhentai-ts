@@ -39,6 +39,7 @@
     },
     "scripts": {
         "build": "tsx src/build.ts",
+        "prepare": "yarn build",
         "lint": "yarn eslint .",
         "format": "yarn prettier --write --config .prettierrc.json \"src/**/*.ts\"",
         "lint:fix": "yarn eslint --fix .",
